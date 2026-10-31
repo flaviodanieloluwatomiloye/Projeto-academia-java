@@ -98,6 +98,43 @@ public class AlunoDAO {
         return null;
     }
 
+    // ALTERAR: atualiza todos os dados do aluno que tem o id informado
+    public void alterar(AlunoCadastrado aluno) {
+        String sql = "UPDATE tbAluno SET nome = ?, email = ?, telefone = ?, cpf = ?, idade = ?, "
+                   + "endereco = ?, sexo = ?, senha = ?, idPlano = ?, idInstrutor = ? WHERE idAluno = ?";
+
+        try (Connection conexao = new Conection().getConnection();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setString(1, aluno.getNome());
+            stmt.setString(2, aluno.getEmail());
+            stmt.setString(3, aluno.getTelefone());
+            stmt.setString(4, aluno.getCpf());
+            stmt.setString(5, aluno.getIdade());
+            stmt.setString(6, aluno.getEndereco());
+            stmt.setString(7, aluno.getSexo());
+            stmt.setString(8, aluno.getSenha());
+
+            if (aluno.getPlanoEscolhido() != null) {
+                stmt.setInt(9, aluno.getPlanoEscolhido().getId());
+            } else {
+                stmt.setNull(9, Types.INTEGER);
+            }
+
+            if (aluno.getInstrutorResponsavel() != null) {
+                stmt.setInt(10, aluno.getInstrutorResponsavel().getId());
+            } else {
+                stmt.setNull(10, Types.INTEGER);
+            }
+
+            stmt.setInt(11, aluno.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public boolean remover(String cpf) {
         String sql = "DELETE FROM tbAluno WHERE cpf = ?";
 

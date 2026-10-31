@@ -9,6 +9,31 @@ public class InstrutorController {
 
     public List<Instrutor> listarInstrutores() { return instrutorDAO.listar(); }
 
+    /** Alteração de instrutor existente (tela AlterarInstrutor). Retorna null se deu certo; senão, a mensagem de erro. */
+    public String alterar(Instrutor instrutor) {
+        String erro = Validador.validarPessoa(instrutor);
+        if (erro != null) {
+            return erro;
+        }
+        if (Validador.vazio(instrutor.getFuncao())) {
+            return "Informe a função do instrutor.";
+        }
+        try {
+            Instrutor porCpf = instrutorDAO.buscarPorCpf(instrutor.getCpf());
+            if (porCpf != null && porCpf.getId() != instrutor.getId()) {
+                return "Já existe outro instrutor cadastrado com esse CPF.";
+            }
+            Instrutor porEmail = instrutorDAO.buscarPorEmail(instrutor.getEmail());
+            if (porEmail != null && porEmail.getId() != instrutor.getId()) {
+                return "Já existe outro instrutor cadastrado com esse e-mail.";
+            }
+            instrutorDAO.alterar(instrutor);
+        } catch (RuntimeException e) {
+            return "Erro ao acessar o banco de dados: " + e.getMessage();
+        }
+        return null;
+    }
+
     /** Retorna null se deu certo; senão, a mensagem de erro. */
     public String cadastrar(Instrutor instrutor) {
         String erro = Validador.validarPessoa(instrutor);

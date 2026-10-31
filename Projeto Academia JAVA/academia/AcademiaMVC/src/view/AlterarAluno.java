@@ -1,0 +1,101 @@
+package view;
+
+import controller.AlunoController;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import model.AlunoCadastrado;
+import model.Instrutor;
+import model.Plano;
+
+public class AlterarAluno extends JFrame {
+
+    private final AlunoController controller = new AlunoController();
+    private final PainelPessoa painel = new PainelPessoa();
+    private final AlunoCadastrado original;
+    private final Runnable aoSalvar;
+
+    private JComboBox<Plano> cbPlano;
+    private JComboBox<Instrutor> cbInstrutor;
+
+    public AlterarAluno(AlunoCadastrado aluno, Runnable aoSalvar) {
+        this.original = aluno;
+        this.aoSalvar = aoSalvar;
+
+        setTitle("Alterar Aluno");
+        setSize(800, 600);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setLayout(null);
+
+        add(painel);
+        painel.preencher(aluno);
+
+        addLabel("Plano: ", 280);
+        cbPlano = new JComboBox<>(controller.listarPlanos().toArray(new Plano[0]));
+        cbPlano.setBounds(150, 280, 250, 25);
+        add(cbPlano);
+        selecionarPlano(aluno.getPlanoEscolhido());
+
+        addLabel("Instrutor: ", 320);
+        cbInstrutor = new JComboBox<>(controller.listarInstrutores().toArray(new Instrutor[0]));
+        cbInstrutor.setBounds(150, 320, 250, 25);
+        add(cbInstrutor);
+        selecionarInstrutor(aluno.getInstrutorResponsavel());
+
+        JButton btSalvar = new JButton("Salvar alterações");
+        btSalvar.setBounds(150, 370, 160, 30);
+        add(btSalvar);
+        btSalvar.addActionListener(e -> salvar());
+
+        setVisible(true);
+    }
+
+    // Seleciona no combo o plano atual do aluno (compara pelo id, pois os objetos vêm de consultas diferentes)
+    private void selecionarPlano(Plano atual) {
+        if (atual == null) return;
+        for (int i = 0; i < cbPlano.getItemCount(); i++) {
+            if (cbPlano.getItemAt(i).getId() == atual.getId()) {
+                cbPlano.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void selecionarInstrutor(Instrutor atual) {
+        if (atual == null) return;
+        for (int i = 0; i < cbInstrutor.getItemCount(); i++) {
+            if (cbInstrutor.getItemAt(i).getId() == atual.getId()) {
+                cbInstrutor.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    private void salvar() {
+        AlunoCadastrado aluno = new AlunoCadastrado(
+                painel.getNome(), painel.getCpf(), painel.getEmail(), painel.getTelefone(),
+                painel.getIdade(), painel.getEndereco(), painel.getSexo(), painel.getSenha(),
+                (Plano) cbPlano.getSelectedItem(), (Instrutor) cbInstrutor.getSelectedItem());
+        aluno.setId(original.getId()); // o id identifica qual registro será alterado
+
+        String erro = controller.alterar(aluno);
+        if (erro != null) {
+            JOptionPane.showMessageDialog(this, erro, "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JOptionPane.showMessageDialog(this, "Aluno alterado com sucesso!");
+        aoSalvar.run();
+        dispose();
+    }
+
+    private void addLabel(String texto, int y) {
+        JLabel lb = new JLabel(texto);
+        lb.setBounds(40, y, 100, 25);
+        add(lb);
+    }
+}

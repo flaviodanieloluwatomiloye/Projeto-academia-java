@@ -1,6 +1,7 @@
 package view;
 
 import java.text.ParseException;
+import model.Pessoa;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -88,6 +89,20 @@ public class PainelPessoa extends JPanel {
         if (rbM.isSelected()) return rbM.getText();
         if (rbO.isSelected()) return rbO.getText();
         return "";
+    }
+
+    /** Preenche os campos com os dados de uma pessoa (usado nas telas de alteração). */
+    public void preencher(Pessoa p) {
+        txNome.setText(p.getNome());
+        txEmail.setText(p.getEmail());
+        txTelefone.setText(p.getTelefone());
+        txCPF.setText(p.getCpf());
+        cbIdade.setSelectedItem(p.getIdade());
+        txEndereco.setText(p.getEndereco());
+        rbF.setSelected(rbF.getText().equals(p.getSexo()));
+        rbM.setSelected(rbM.getText().equals(p.getSexo()));
+        rbO.setSelected(rbO.getText().equals(p.getSexo()));
+        paSenha.setText(p.getSenha());
     }
 
     private void addLabel(String texto, int y) {

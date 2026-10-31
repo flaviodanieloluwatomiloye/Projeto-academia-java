@@ -53,6 +53,31 @@ public class InstrutorDAO {
         return instrutores;
     }
 
+    // ALTERAR: atualiza todos os dados do instrutor que tem o id informado
+    public void alterar(Instrutor instrutor) {
+        String sql = "UPDATE tbInstrutor SET nome = ?, email = ?, telefone = ?, cpf = ?, idade = ?, "
+                   + "endereco = ?, sexo = ?, senha = ?, funcao = ? WHERE idInstrutor = ?";
+
+        try (Connection conexao = new Conection().getConnection();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setString(1, instrutor.getNome());
+            stmt.setString(2, instrutor.getEmail());
+            stmt.setString(3, instrutor.getTelefone());
+            stmt.setString(4, instrutor.getCpf());
+            stmt.setString(5, instrutor.getIdade());
+            stmt.setString(6, instrutor.getEndereco());
+            stmt.setString(7, instrutor.getSexo());
+            stmt.setString(8, instrutor.getSenha());
+            stmt.setString(9, instrutor.getFuncao());
+            stmt.setInt(10, instrutor.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Instrutor buscarPorId(int id) {
         String sql = "SELECT * FROM tbInstrutor WHERE idInstrutor = ?";
 

@@ -27,6 +27,29 @@ public class AlunoController {
         return salvar(aluno, true);
     }
 
+    /** Alteração de aluno existente (tela AlterarAluno). Retorna null se deu certo; senão, a mensagem de erro. */
+    public String alterar(AlunoCadastrado aluno) {
+        String erro = Validador.validarPessoa(aluno);
+        if (erro != null) {
+            return erro;
+        }
+        try {
+            // O CPF/e-mail pode existir, desde que seja do próprio aluno que está sendo alterado
+            AlunoCadastrado porCpf = alunoDAO.buscarPorCpf(aluno.getCpf());
+            if (porCpf != null && porCpf.getId() != aluno.getId()) {
+                return "Já existe outro aluno cadastrado com esse CPF.";
+            }
+            AlunoCadastrado porEmail = alunoDAO.buscarPorEmail(aluno.getEmail());
+            if (porEmail != null && porEmail.getId() != aluno.getId()) {
+                return "Já existe outro aluno cadastrado com esse e-mail.";
+            }
+            alunoDAO.alterar(aluno);
+        } catch (RuntimeException e) {
+            return "Erro ao acessar o banco de dados: " + e.getMessage();
+        }
+        return null;
+    }
+
     private String salvar(AlunoCadastrado aluno, boolean exigePlano) {
         String erro = Validador.validarPessoa(aluno);
         if (erro != null) {
